@@ -1,0 +1,5 @@
+{
+  "name": "Billiard Tournament Dashboard",
+  "description": "A sleek dashboard to manage billiard tournaments, players, and matches. Features include tournament creation, player management, and an AI-powered assistant for generating tournament descriptions.",
+  "requestFramePermissions": []
+}
