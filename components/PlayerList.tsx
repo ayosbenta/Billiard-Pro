@@ -1,9 +1,40 @@
-
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { Player } from '../types';
+import { PlayerForm } from './PlayerForm';
 
-export const PlayerList: React.FC<{ players: Player[] }> = ({ players }) => {
-    const [sortedPlayers, setSortedPlayers] = useState([...players].sort((a,b) => b.rating - a.rating));
+interface PlayerListProps {
+    players: Player[];
+    onAddPlayer: (player: Omit<Player, 'id'>) => void;
+    onUpdatePlayer: (player: Player) => void;
+    onDeletePlayer: (id: string) => void;
+}
+
+export const PlayerList: React.FC<PlayerListProps> = ({ players, onAddPlayer, onUpdatePlayer, onDeletePlayer }) => {
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
+
+    const sortedPlayers = useMemo(() => {
+        return [...players].sort((a, b) => b.rating - a.rating);
+    }, [players]);
+
+    const handleAddClick = () => {
+        setEditingPlayer(null);
+        setIsFormOpen(true);
+    };
+
+    const handleEditClick = (player: Player) => {
+        setEditingPlayer(player);
+        setIsFormOpen(true);
+    };
+    
+    const handleFormSave = (playerData: Omit<Player, 'id'> | Player) => {
+        if ('id' in playerData) {
+            onUpdatePlayer(playerData);
+        } else {
+            onAddPlayer(playerData);
+        }
+        setIsFormOpen(false);
+    };
 
     return (
         <div className="p-8 h-full overflow-y-auto">
@@ -12,7 +43,7 @@ export const PlayerList: React.FC<{ players: Player[] }> = ({ players }) => {
                     <h1 className="text-4xl font-black text-cue-white tracking-tight">Players</h1>
                     <p className="text-gray-400 mt-1">Manage all registered players.</p>
                 </div>
-                 <button className="px-6 py-3 font-semibold bg-billiard-green text-white rounded-lg shadow-md hover:bg-felt-green transition">
+                 <button onClick={handleAddClick} className="px-6 py-3 font-semibold bg-billiard-green text-white rounded-lg shadow-md hover:bg-felt-green transition">
                     Add Player
                 </button>
             </header>
@@ -24,6 +55,7 @@ export const PlayerList: React.FC<{ players: Player[] }> = ({ players }) => {
                             <th className="p-4 font-semibold">Player</th>
                             <th className="p-4 font-semibold">Nickname</th>
                             <th className="p-4 font-semibold text-right">Rating</th>
+                            <th className="p-4 font-semibold text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -36,11 +68,23 @@ export const PlayerList: React.FC<{ players: Player[] }> = ({ players }) => {
                                 </td>
                                 <td className="p-4 text-gray-300">{player.nickname}</td>
                                 <td className="p-4 font-bold text-billiard-green text-right">{player.rating}</td>
+                                <td className="p-4 text-center">
+                                    <button onClick={() => handleEditClick(player)} className="px-3 py-1 text-sm font-semibold bg-chalk-blue text-white rounded-md hover:bg-blue-700 transition mr-2">Edit</button>
+                                    <button onClick={() => onDeletePlayer(player.id)} className="px-3 py-1 text-sm font-semibold bg-red-600 text-white rounded-md hover:bg-red-800 transition">Delete</button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+            
+            {isFormOpen && (
+                <PlayerForm
+                    player={editingPlayer}
+                    onSave={handleFormSave}
+                    onClose={() => setIsFormOpen(false)}
+                />
+            )}
         </div>
     );
 };

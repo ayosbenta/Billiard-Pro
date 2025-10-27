@@ -11,7 +11,9 @@
   "dependencies": {
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "@google/genai": "^1.27.0"
+    "@google/genai": "^1.27.0",
+    "dexie": "^4.0.8",
+    "dexie-react-hooks": "^1.1.8"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
